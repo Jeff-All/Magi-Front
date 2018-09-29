@@ -1,6 +1,7 @@
 import auth0 from 'auth0-js';
 import { AUTH_CONFIG } from './auth0-variables';
 import history from '../history';
+import $ from "jquery"
 
 export default class Auth {
   userProfile;
@@ -11,10 +12,14 @@ export default class Auth {
     clientID: AUTH_CONFIG.clientId,
     redirectUri: AUTH_CONFIG.callbackUrl,
     responseType: 'token id_token',
-    scope: 'openid profile'
+    scope: 'openid profile',
+    audience: AUTH_CONFIG.audience,
   });
 
   constructor() {
+    this.role = null;
+    this.acquiringRole = false;
+
     this.login = this.login.bind(this);
     this.logout = this.logout.bind(this);
     this.handleAuthentication = this.handleAuthentication.bind(this);
@@ -24,8 +29,49 @@ export default class Auth {
     this.scheduleRenewal();
   }
 
+  isAuthorized(roles, path, props) {
+    console.log("auth.isAuthorized", this)
+    if(!this.role) {
+      if(!this.acquiringRole) { 
+        this.getRole(() => {
+          props.history.replace(`/${path}`);
+        }); 
+      }
+      return false;
+    }
+    return roles.indexOf(this.role) > -1;
+  }
+
+  getRole(callback) {
+    $.ajax({
+      url: 'https://localhost:8081/role',
+      type: 'GET',
+      data: "",
+      dataType: "text",
+      beforeSend: xhr => {
+        this.acquiringRole = true;
+        xhr.setRequestHeader(
+          'Authorization', "Bearer " + 
+          localStorage.getItem('id_token')
+        );
+      },
+      success: txt => {
+        console.log("auth.getRole:Success", txt);
+        this.role = txt;
+        this.acquiringRole = false;
+        callback();
+      },
+      error: (jqXHR, status, error) => {
+        console.log("auth.getRole:Error", jqXHR);
+        this.acquiringRole = false;
+        // callback();
+      },
+    });
+  }
+
   login() {
-    this.auth0.authorize();
+    console.log(this.auth0);
+    setTimeout(this.auth0.authorize(), 5000);
   }
 
   handleAuthentication() {
@@ -42,11 +88,11 @@ export default class Auth {
   }
 
   setSession(authResult) {
+    console.log("setSession", authResult);
     // Set the time that the access token will expire at
     let expiresAt = JSON.stringify(
       authResult.expiresIn * 1000 + new Date().getTime()
     );
-
     localStorage.setItem('access_token', authResult.accessToken);
     localStorage.setItem('id_token', authResult.idToken);
     localStorage.setItem('expires_at', expiresAt);

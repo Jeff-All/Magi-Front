@@ -12,17 +12,6 @@ class Home extends Component {
         {isAuthenticated() &&
           <div>
             <h4>You are logged in!</h4>
-            <h3>About Your Access Token</h3>
-            <p>
-              Your <code>access_token</code> has an expiry date of:{' '}
-              {this.getExpiryDate()}
-            </p>
-            <p>
-              The token has been scheduled for renewal, but you can also renew it manually from the navbar
-              if you don't want to wait. This manual renewal button is really
-              just for demonstration and you probably won't want such a control
-              in your actual application.
-            </p>
           </div>}
         {!isAuthenticated() &&
           <h4>
