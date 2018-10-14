@@ -6,8 +6,10 @@ import {
     Table,
     Pager,
     Overlay,
+    Tab,
+    Tabs,
 } from 'react-bootstrap';
-
+import JSONTable from '../JSONTable/JSONTable'
 import processFile from './Processor'
 import $ from "jquery"
 
@@ -105,11 +107,13 @@ class Upload extends React.Component {
   }
 
   upload() {
-    console.log("upload")
+    console.log("upload", this.file)
     this.setState({
+      file: this.file,
       active: true,
     })
-    processFile((data) => this.processorCallback(data), this.batchID, this.file);
+    console.log("upload.2", this.file)
+    processFile((data) => this.processorCallback(data), this.file);
   }
 
   processorCallback(data) {
@@ -211,69 +215,62 @@ class Upload extends React.Component {
 
   render() {
     return(
-      <Panel>
-        <div>
-          <label>Batch ID</label>
-          <input type="text"
+      <div>
+        <Panel>
+          <input type="file" accept=".csv, .xls, .xlsx"
             onChange={ event => {
-              console.log("BatchID:change", event.target.value);
-              this.batchID = event.target.value;
-            }}  
-          ></input>
-        </div>
-        <input type="file" accept=".csv, .xls, .xlsx"
-          onChange={ event => {
-            console.log("change");
-            this.file = event.target.files[0];
-          }}
-        />
-        <Button bsStyle="primary"
-          onClick={ event => {
-            console.log("upload:click");
-            this.upload();
-          }}
-        >Upload</Button>
-        {this.state.active
-          ? <span>
-              <div>{this.state.current}/{this.state.count} {
-                this.state.errors ? <Overlay id="error:tooltip">{this.state.errors.length}</Overlay>:null}
-              </div>
-              <ProgressBar striped
-                now={(this.state.current / this.state.count) * 100} 
-                // label={`${this.state.current}/${this.state.count}`} 
-              />
-            </span>
-          : null
-        }
-        {this.state.active && this.state.errors
-          ? <Panel>
-            <Table striped condensed responsive bordered>
-              <thead>
-                <tr>
-                  <th>#</th>
-                  <th>Sheet</th>
-                  <th>Row</th>
-                  <th>Error</th>
-                </tr>
-              </thead>
-              <tbody>
-                { this.renderErrorRows() }
-              </tbody>
-            </Table>
-            <Pager onSelect={ this.handlePageClick.bind(this) }>
-                {this.state.page > 0
-                  ? <Pager.Item previous eventKey="previous" >Previous</Pager.Item>
-                  : null
-                }
-                {this.state.page < Math.floor((this.state.errors.length-1) / this.state.limit)
-                  ? <Pager.Item next eventKey="next">Next</Pager.Item>
-                  : null
-                }
-            </Pager>
-          </Panel>
-          : null
-        }
-      </Panel>
+              console.log("change");
+              this.file = event.target.files[0];
+            }}
+          />
+          <Button bsStyle="primary"
+            onClick={ event => {
+              console.log("upload:click");
+              this.upload();
+            }}
+          >Upload</Button>
+          {this.state.active
+            ? <span>
+                <div>{this.state.current}/{this.state.count} {
+                  this.state.errors ? <Overlay id="error:tooltip">{this.state.errors.length}</Overlay>:null}
+                </div>
+                <ProgressBar striped
+                  now={(this.state.current / this.state.count) * 100} 
+                  // label={`${this.state.current}/${this.state.count}`} 
+                />
+              </span>
+            : null
+          }
+          {this.state.active && this.state.errors
+            ? <Panel>
+              <Table striped condensed responsive bordered>
+                <thead>
+                  <tr>
+                    <th>#</th>
+                    <th>Sheet</th>
+                    <th>Row</th>
+                    <th>Error</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  { this.renderErrorRows() }
+                </tbody>
+              </Table>
+              <Pager onSelect={ this.handlePageClick.bind(this) }>
+                  {this.state.page > 0
+                    ? <Pager.Item previous eventKey="previous" >Previous</Pager.Item>
+                    : null
+                  }
+                  {this.state.page < Math.floor((this.state.errors.length-1) / this.state.limit)
+                    ? <Pager.Item next eventKey="next">Next</Pager.Item>
+                    : null
+                  }
+              </Pager>
+            </Panel>
+            : null
+          }
+        </Panel>
+      </div>
     );
   }
 }

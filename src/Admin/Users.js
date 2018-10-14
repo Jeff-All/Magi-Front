@@ -8,6 +8,7 @@ import {
   Overlay,
   Tab,
   Tabs,
+  Glyphicon,
 } from 'react-bootstrap';
 import JSONTable from '../JSONTable/JSONTable'
 import $ from "jquery"
@@ -80,7 +81,7 @@ class Users extends React.Component {
   async LockUser(data, callback) {
     console.log("lockUser", data, callback)
     $.ajax({
-      url: `https://localhost:8081/admin/users?where=ID=${data.ID}`,
+      url: `https://localhost:8081/admin/users?where=ID=${data.data.ID}`,
       type: 'PATCH',
       data: JSON.stringify({Locked: true}),
       dataType: "json",
@@ -101,7 +102,7 @@ class Users extends React.Component {
   async UnLockUser(data, callback) {
     console.log("UnLockUser", data, callback)
     $.ajax({
-      url: `https://localhost:8081/admin/users?where=ID=${data.ID}`,
+      url: `https://localhost:8081/admin/users?where=ID=${data.data.ID}`,
       type: 'PATCH',
       data: JSON.stringify({Locked: false}),
       dataType: "json",
@@ -122,7 +123,7 @@ class Users extends React.Component {
   async ActivateUser(data, callback) {
     console.log("ActivateUser", data, callback)
     $.ajax({
-      url: `https://localhost:8081/admin/users?where=ID=${data.ID}`,
+      url: `https://localhost:8081/admin/users?where=ID=${data.data.ID}`,
       type: 'PATCH',
       data: JSON.stringify({Active: true}),
       dataType: "json",
@@ -140,6 +141,51 @@ class Users extends React.Component {
     });
   }
 
+  async GetRoles(column, callback) {
+    console.log("GetRoles", column, callback)
+    $.ajax({
+      url: `https://localhost:8081/roles?limit=20`,
+      type: 'GET',
+      data: "{}",
+      dataType: "json",
+      beforeSend: function(xhr){
+        xhr.setRequestHeader(
+          'Authorization', "Bearer " + 
+          localStorage.getItem('id_token')
+        );
+      },
+      success: (json)=>callback(json, column, "Name"),
+      error: (jqXHR, status, error) => {
+        console.log("error getting roles", jqXHR, status, error);
+        alert("error getting roles");
+      },
+    });
+  }
+
+  async UpdateUser(
+    data,
+    callback,
+  ) {
+    console.log("UpdateUser", data, callback)
+    $.ajax({
+      url: `https://localhost:8081/admin/users?where=ID=${data.data.ID}`,
+      type: 'PATCH',
+      data: JSON.stringify(data.changes),
+      dataType: "json",
+      beforeSend: function(xhr){
+        xhr.setRequestHeader(
+          'Authorization', "Bearer " + 
+          localStorage.getItem('id_token')
+        );
+      },
+      success: callback,
+      error: (jqXHR, status, error) => {
+        console.log("error updating user", jqXHR, status, error);
+        alert("error updating user");
+      },
+    });
+  }
+
   render() {
     return (
       <Tabs defaultActiveKey="active" id="t">
@@ -147,36 +193,53 @@ class Users extends React.Component {
           <JSONTable striped bordered condensed hover responsive
           limit={10}
           dataSource={this.GetActiveUsers.bind(this)}
-          actions={[
-            {
-              render: (onClick)=><Button onClick={onClick}>Lock</Button>,
-              action: this.LockUser.bind(this),
+          update={this.UpdateUser.bind(this)}
+          actions={{
+            Activate: {
+              glyph:"lock",
+              onClick: this.LockUser.bind(this),
             },
-          ]}
+            Update: {
+              glyph:"floppy-save",
+              isDisabled: (ctx)=>!ctx.props.changed,
+              onClick:this.UpdateUser.bind(this),
+            }
+          }}
+          sources={{
+            Role: this.GetRoles.bind(this),
+          }}
           />
         </Tab>
         <Tab eventKey="inactive" title="Inactive">
           <JSONTable striped bordered condensed hover responsive
             limit={10}
             dataSource={this.GetInactiveUsers.bind(this)}
-            actions={[
-              {
-                render: (onClick)=><Button onClick={onClick}>Activate</Button>,
-                action: this.ActivateUser.bind(this),
+            actions={{
+              Activate: {
+                glyph:"ok",
+                onClick: this.ActivateUser.bind(this),
               },
-            ]}
+              Update: {
+                glyph:"floppy-save",
+                onClick:this.UpdateUser.bind(this),
+              }
+            }}
           />
         </Tab>
         <Tab eventKey="locked" title="Locked">
           <JSONTable striped bordered condensed hover responsive
             limit={10}
             dataSource={this.GetLockedUsers.bind(this)}
-            actions={[
-              {
-                render: (onClick)=><Button onClick={onClick}>Un-Lock</Button>,
-                action: this.UnLockUser.bind(this),
+            actions={{
+              UnLockUser: {
+                glyph:"ok",
+                onClick: this.UnLockUser.bind(this),
               },
-            ]}
+              Update: {
+                glyph:"floppy-save",
+                onClick:this.UpdateUser.bind(this),
+              }
+            }}
           />
         </Tab>
       </Tabs>

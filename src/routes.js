@@ -8,6 +8,8 @@ import Auth from './Auth/Auth';
 import history from './history';
 import Upload from './Upload/Upload'
 import Users from './Admin/Users'
+import Requests from './Requests/Requests'
+import Tags from './Tags/Tags'
 
 const auth = new Auth();
 
@@ -32,6 +34,18 @@ export const makeMainRoutes = () => {
           || !auth.isAuthorized("admin", "upload", props)
             ? <Redirect to="/home" />
             : <Upload auth={auth} itemsPerRequest={1} {...props} />
+        } />
+        <Route path="/requests" render={ props => 
+          !auth.isAuthenticated() 
+          || !auth.isAuthorized("admin", "requests", props)
+            ? <Redirect to="/home" />
+            : <Requests/>
+        } />
+        <Route path="/tags" render={ props => 
+          !auth.isAuthenticated() 
+          || !auth.isAuthorized("admin", "tags", props)
+            ? <Redirect to="/home" />
+            : <Tags/>
         } />
         <Route path="/admin/users" render={ props => 
           !auth.isAuthenticated() 

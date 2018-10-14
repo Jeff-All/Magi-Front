@@ -52,7 +52,8 @@ class App extends Component {
     if(isAuthenticated()) {
       navItems.push(
         <NavItem key="Upload" eventKey="Upload">Upload</NavItem>,
-        <NavItem key="Print" eventKey="Print">Print</NavItem>,
+        <NavItem key="Requests" eventKey="Requests">Requests</NavItem>,
+        <NavItem key="Tags" eventKey="Tags">Tags</NavItem>,
         <NavItem key="Scan" eventKey="Scan">Scan</NavItem>,
         <NavItem key="Shopping" eventKey="Shopping">Shopping</NavItem>,
         // <NavItem key="Admin" eventKey="Admin">Admin</NavItem>,

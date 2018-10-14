@@ -7,3 +7,7 @@ body {
 td {
   word-wrap: none;
 }
+
+.table-responsive {
+  overflow: visible !important;
+}

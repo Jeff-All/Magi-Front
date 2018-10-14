@@ -44,7 +44,7 @@ export default class Auth {
 
   getRole(callback) {
     $.ajax({
-      url: 'https://localhost:8081/role',
+      url: 'https://localhost:8081/user/role',
       type: 'GET',
       data: "",
       dataType: "text",

@@ -1,7 +1,7 @@
 
 import xlsx from 'xlsx'
 
-export default function processFile(callback, batch, file) {
+export default function processFile(callback, file) {
   console.log("process")
   if(!file) {
     console.log("file is null")
@@ -11,30 +11,28 @@ export default function processFile(callback, batch, file) {
   reader.onload = event => {
       processWorkbook(
         callback,
-        batch,
         xlsx.read(event.target.result, {type: 'binary'}),
       );
   }
   reader.readAsBinaryString(file)
 }
 
-function processWorkbook(callback, batch, workbook) {
+function processWorkbook(callback, workbook) {
   workbook.SheetNames.forEach(element => {
     processWorksheet(
       callback,
-      batch,
       workbook.Sheets[element],
       element,
     );
   });
 }
 
-async function processWorksheet(callback, batch, worksheet, sheetName) {
+async function processWorksheet(callback, worksheet, sheetName) {
   let headerMap = getHeaderMap(worksheet);
   let toReturn = [];
   for(let row=2; worksheet[headerMap.family_id+row]; row++) {
     toReturn.push(processRow(
-      headerMap, batch, sheetName, worksheet, row,
+      headerMap, sheetName, worksheet, row,
     ))
   }
   callback(toReturn);
@@ -56,12 +54,11 @@ function getHeaderMap(worksheet) {
   return map
 }
 
-function processRow(headerMap, batch, sheetName, worksheet, row) {
+function processRow(headerMap, sheetName, worksheet, row) {
   console.log("processRow", sheetName, row);
   var jsonObj = {
       row: row,
       sheet: sheetName,
-      batch: batch,
 
       FamilyID:   getValue(worksheet[headerMap["family_id"] + row]),
       Response:   getValue(worksheet[headerMap["response"] + row]),
