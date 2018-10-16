@@ -24,7 +24,7 @@ class Tags extends React.Component {
     console.log("Tags.Constructor", this.state.renderer)
   }
 
-  async GetTags(limit, offset, callback) {
+  async GetRequests(limit, offset, callback) {
     $.ajax({
       url: `https://localhost:8081/requests?limit=${limit}&offset=${offset}`,
       type: 'GET',
@@ -42,18 +42,24 @@ class Tags extends React.Component {
     });
   }
 
-  componentDidMount() {
-    // this.state.renderer.generateImage()
+  generateImage(data) {
+    console.log("Tags.generateImage", this.renderer)
+    this.renderer.generateImage(data);
+    this.setState({generated: true});
   }
 
+  componentDidMount() {
+    this.GetRequests(10, 0, (data)=>this.generateImage(data))
+    // this.state.renderer.generateImage()
+  }
 
   render() { 
     return (
     <Panel>
-      <Button onClick={()=>
+      {/* <Button onClick={()=>this.generateImage()}>Generate Image</Button>
+        {this.state && this.state.generated ? <Button onClick={()=>
         {
-          console.log("Tags.Render.click", this.renderer)
-          this.renderer.generateImage();
+          console.log("Tags.Render.print.click", this.renderer)
           const dataUrl = this.renderer.refs.canvas.toDataURL();
           // const dataUrl = document.getElementById('the-pdf-canvas').toDataURL(); 
 
@@ -77,8 +83,8 @@ class Tags extends React.Component {
           }, true);
           
         }
-        }>Generate Image</Button>
-      <Renderer width={3000} height={2000} ref={instance => {this.renderer = instance}}/>
+        }>Print</Button>:"what"} */}
+      <Renderer width={3000} height={2000} ref={instance => {this.renderer = instance}} tagWidth={200} tagHeight={200}/>
     </Panel>
     );
   }
