@@ -43,7 +43,7 @@ class Tags extends React.Component {
   }
 
   generateImage(data) {
-    console.log("Tags.generateImage", this.renderer)
+    console.log("Tags.generateImage", this.renderer, data)
     this.renderer.generateImage(data);
     this.setState({generated: true});
   }
@@ -56,35 +56,10 @@ class Tags extends React.Component {
   render() { 
     return (
     <Panel>
-      {/* <Button onClick={()=>this.generateImage()}>Generate Image</Button>
-        {this.state && this.state.generated ? <Button onClick={()=>
-        {
-          console.log("Tags.Render.print.click", this.renderer)
-          const dataUrl = this.renderer.refs.canvas.toDataURL();
-          // const dataUrl = document.getElementById('the-pdf-canvas').toDataURL(); 
-
-          let windowContent = '<!DOCTYPE html>';
-          windowContent += '<html>';
-          windowContent += '<head><title>Print canvas</title></head>';
-          windowContent += '<body>';
-          windowContent += '<img src="' + dataUrl + '">';
-          windowContent += '</body>';
-          windowContent += '</html>';
-      
-          const printWin = window.open('', '', 'width=800,height=800');
-          printWin.document.open();
-          printWin.document.write(windowContent); 
-      
-          printWin.document.addEventListener('load', function() {
-              printWin.focus();
-              printWin.print();
-              printWin.document.close();
-              printWin.close();            
-          }, true);
-          
-        }
-        }>Print</Button>:"what"} */}
-      <Renderer width={3000} height={2000} ref={instance => {this.renderer = instance}} tagWidth={200} tagHeight={200}/>
+      <Renderer 
+        width={3000} 
+        height={2000} 
+        ref={instance => {this.renderer = instance}} tagWidth={200} tagHeight={200}/>
     </Panel>
     );
   }
